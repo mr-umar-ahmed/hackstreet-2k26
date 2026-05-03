@@ -8,15 +8,17 @@ import { Terminal, Shield, Cpu, Zap } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-// Register GSAP Plugin safely
+// Register GSAP Plugin safely for Next.js SSR environment
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+// Internal Utility to handle Tailwind class merging
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// Scoped styles for the Cyber-Mint aesthetic
 const STYLES = `
 .cinematic-footer-wrapper {
   --pill-bg-1: rgba(0, 255, 194, 0.05);
@@ -63,6 +65,7 @@ const STYLES = `
 }
 `;
 
+// Magnetic Button Primitive with proper TypeScript interfaces
 interface MagneticButtonProps extends React.HTMLAttributes<HTMLElement> {
   as?: React.ElementType;
   href?: string;
@@ -98,6 +101,8 @@ const MagneticButton = React.forwardRef<HTMLElement, MagneticButtonProps>(
 
     return (
       <Component
+        // Suppress hydration warning to ignore browser-extension attributes like fdprocessedid
+        suppressHydrationWarning
         ref={(node: HTMLElement | null) => {
           (localRef as React.MutableRefObject<HTMLElement | null>).current = node;
           if (typeof forwardedRef === "function") forwardedRef(node);
@@ -131,6 +136,7 @@ export default function Footer() {
   useEffect(() => {
     if (!wrapperRef.current) return;
     const ctx = gsap.context(() => {
+      // Parallax effect for the background text as it enters viewport
       gsap.fromTo(giantTextRef.current, { y: 100, opacity: 0 }, {
         y: 0, opacity: 1, scrollTrigger: {
           trigger: wrapperRef.current,
@@ -146,18 +152,22 @@ export default function Footer() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: STYLES }} />
+      {/* The Wrapper creates the "Curtain" viewport via clip-path */}
       <div
         ref={wrapperRef}
         className="relative h-[80vh] md:h-screen w-full"
         style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
       >
+        {/* The actual footer stays fixed to the viewport underneath the content */}
         <footer className="fixed bottom-0 left-0 flex h-[80vh] md:h-screen w-full flex-col justify-between overflow-hidden bg-black text-white cinematic-footer-wrapper border-t border-white/5">
           <div className="footer-matrix-grid absolute inset-0 z-0 pointer-events-none opacity-40" />
 
+          {/* Large background "watermark" text */}
           <div ref={giantTextRef} className="footer-giant-bg-text absolute -bottom-[2vh] left-1/2 -translate-x-1/2 whitespace-nowrap z-0 pointer-events-none select-none tracking-tighter uppercase italic">
             HACKSTREET
           </div>
 
+          {/* Marquee Navigation Bar */}
           <div className="absolute top-20 left-0 w-full overflow-hidden border-y border-[#00FFC2]/10 bg-black/80 backdrop-blur-md py-4 z-10 -rotate-1 scale-105">
             <div className="flex w-max animate-footer-scroll-marquee text-[10px] md:text-xs font-mono tracking-[0.4em] text-[#00FFC2] uppercase">
               <MarqueeItem />
@@ -165,6 +175,7 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* Main Footer Call to Action */}
           <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 mt-20">
             <h2 className="text-5xl md:text-8xl font-black tracking-tighter mb-8 text-center italic uppercase">
               Ready to <span className="text-[#00FFC2]">Deploy?</span>
@@ -183,9 +194,10 @@ export default function Footer() {
                 </MagneticButton>
               </div>
 
+              {/* Legal and Conduct Links */}
               <div className="flex flex-wrap justify-center gap-6 mt-4">
                 {["Privacy_Policy", "Terms_of_Service", "Code_of_Conduct"].map((link) => (
-                  <a key={link} href="#" className="text-[10px] font-mono text-gray-500 hover:text-[#00FFC2] transition-colors tracking-widest uppercase">
+                  <a key={link} href="#" className="text-[10px] font-mono text-gray-500 hover:text-[#00FFC2] transition-colors tracking-widest uppercase" suppressHydrationWarning>
                     {link.replace(/_/g, " ")}
                   </a>
                 ))}
@@ -193,11 +205,13 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* System Status and Branding Footer Bar */}
           <div className="relative z-20 w-full pb-10 px-8 md:px-16 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="text-gray-600 text-[10px] font-mono tracking-[0.2em] uppercase order-2 md:order-1">
+            <div className="text-gray-600 text-[10px] font-mono tracking-[0.2em] uppercase order-2 md:order-1" suppressHydrationWarning>
               © {new Date().getFullYear()} HACKSTREET_INITIATIVE. ALL_SYSTEMS_GO.
             </div>
 
+            {/* Raichur Node Status Badge */}
             <div className="footer-glass-pill px-6 py-3 rounded-xl flex items-center gap-3 order-1 md:order-2 border-[#00FFC2]/10 bg-[#00FFC2]/5">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#00FFC2] animate-pulse" />
@@ -207,6 +221,7 @@ export default function Footer() {
               <span className="text-[10px] font-mono text-[#00FFC2] font-black uppercase">Uptime: 99.9%</span>
             </div>
 
+            {/* Back to top scroll trigger */}
             <MagneticButton
               as="button"
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
